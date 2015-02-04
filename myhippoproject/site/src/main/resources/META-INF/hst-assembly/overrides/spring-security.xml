@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!-- Defininig SpringSecurityValve -->
+    <bean id="springSecurityValve"
+          class="org.onehippo.forge.security.support.springsecurity.container.SpringSecurityValve">
+        <property name="valveName" value="springSecurityValve"/>
+    </bean>
+
+    <!--
+      Inserting SpringSecurityValve into the default pipeline.
+      You may copy and paste the following block to insert the SpringSecurityValve for more pipelines.
+      'DefaultSitePipeline' is for the default website pipeline.
+      'JaxrsRestContentPipeline' is for the Content/Context Aware JAX-RS Service pipeline.
+      'JaxrsRestPlainPipeline' is for the Plain JAX-RS Service pipeline.
+    -->
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject">
+            <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+                <property name="targetObject" ref="org.hippoecm.hst.core.container.Pipelines"/>
+                <property name="targetMethod" value="getPipeline"/>
+                <property name="arguments">
+                    <list>
+                        <!--
+                          You may use one of the following: 'DefaultSitePipeline', 'JaxrsRestContentPipeline' and 'JaxrsRestPlainPipeline'.
+                        -->
+                        <value>DefaultSitePipeline</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="targetMethod" value="addInitializationValve"/>
+        <property name="arguments">
+            <ref bean="springSecurityValve"/>
+        </property>
+    </bean>
+</beans>
+
+

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                            
+         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!-- Bypass SITE requests, originating from the CMS, for correct Channel Manager  operation -->
+    <security:http pattern="/_rp/**" security="none"/>
+    <security:http pattern="/_cmsrest/**" security="none"/>
+    <security:http pattern="/_cmsinternal/**" security="none"/>
+
+    <!-- Bypass SITE requests targeting static resources  -->
+    <security:http pattern="/static/**" security="none"/>
+
+    <!-- Bypass SITE requests targeting the ping servlet to allow health checks -->
+    <security:http pattern="/ping/**" security="none"/>
+
+    <!-- Secure SITE other requests -->
+    <security:http auto-config="true" use-expressions="true">
+        <!-- Interception constraints -->
+        <security:intercept-url pattern="/**" access="isFullyAuthenticated()"/>
+
+        <!-- Login/Logout -->
+        <security:form-login default-target-url="/"/>
+        <security:logout logout-url="/uitloggen"
+                         invalidate-session="true"
+                         delete-cookies="JSESSIONID"/>
+    </security:http>
+
+    <!-- Spring Security Authentication Manager -->
+    <security:authentication-manager>
+        <security:authentication-provider ref="hippoAuthenticationProvider"/>
+    </security:authentication-manager>
+
+    <!-- Hippo Repository Authentication Provider, as provided by the HST Spring Security Plugin -->
+    <bean id="hippoAuthenticationProvider"
+          class="org.onehippo.forge.security.support.springsecurity.authentication.HippoAuthenticationProvider">
+    </bean>
+</beans>
+
+
